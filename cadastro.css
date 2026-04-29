@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" href="css/cadastro.css">
+</head>
+<body>
+
+<button id="theme-btn" onclick="toggleTheme()">Alternar Tema</button>
+
+<div class="login-container">
+    <header>
+        <h2>Cadastro de Usuário</h2>
+        <p class="subtitle">Preencha os campos abaixo para criar sua conta.</p>
+    </header>
+
+    <main>
+        <form onsubmit="event.preventDefault(); cadastrar();">
+            <h3 class="form-title">Informações Pessoais</h3>
+
+            <div class="input-group">
+                <label for="nome">Nome completo:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+
+            <div class="input-group">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="input-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+            </div>
+
+            <div class="input-group">
+                <label for="confirmarSenha">Confirmar senha:</label>
+                <input type="password" id="confirmarSenha" name="confirmarSenha" required>
+            </div>
+
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" name="lembrar"> Lembrar usuário
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary">Cadastrar</button>
+        </form>
+
+        <p id="mensagem" style="margin-top: 15px; text-align: center;"></p>
+        <p class="footer-text">Já tem uma conta? <a href="login.html">Faça login</a></p>
+    </main>
+</div>
+
+<script src="js/cadastro.js"></script>
+
+</body>
+</html>

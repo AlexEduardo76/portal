@@ -1,0 +1,461 @@
+// ============================================
+// ESTRUTURA DE DADOS
+// ============================================
+const API_URL = "http://localhost:63342/taskflow/taskflow.main/static/frequencia.html";
+let alunos = [];
+let ucs = [];
+let aulas = [];
+let turmaId = null;
+let turmaNome = null;
+
+// Chave para salvar no localStorage
+const STORAGE_KEY_FREQUENCIA = 'sistema_frequencia_';
+
+// ============================================
+// FUNÇÕES DE CARREGAMENTO
+// ============================================
+
+/**
+ * Carrega os dados da turma do localStorage
+ */
+function carregarDadosTurma() {
+    turmaId = localStorage.getItem("turmaAtual");
+
+    if (!turmaId) {
+        alert("Nenhuma turma selecionada! Volte para a Tela da Turma.");
+        return false;
+    }
+
+    // Carrega alunos da turma
+    const chaveAlunos = `alunos_${turmaId}`;
+    const alunosSalvos = localStorage.getItem(chaveAlunos);
+
+    if (alunosSalvos) {
+        alunos = JSON.parse(alunosSalvos);
+        document.getElementById('totalAlunos').textContent = alunos.length;
+    } else {
+        alunos = [];
+        document.getElementById('totalAlunos').textContent = '0';
+    }
+
+    // Carrega UCs da turma
+    const chaveUCs = `ucs_${turmaId}`;
+    const ucsSalvos = localStorage.getItem(chaveUCs);
+
+    if (ucsSalvos) {
+        ucs = JSON.parse(ucsSalvos);
+        popularSelectUC();
+    } else {
+        ucs = [];
+    }
+
+    // Carrega o nome da turma
+    const turmasSalvas = localStorage.getItem('turmas_sistema');
+    if (turmasSalvas) {
+        const turmas = JSON.parse(turmasSalvas);
+        const turmaEncontrada = turmas.find(t => t.id == turmaId);
+        if (turmaEncontrada) {
+            turmaNome = turmaEncontrada.nome;
+            document.getElementById('turma').value = turmaNome;
+            document.getElementById('nomeTurma').textContent = turmaNome;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Popula o select de UCs
+ */
+function popularSelectUC() {
+    const selectUC = document.getElementById('uc');
+    selectUC.innerHTML = '<option value="">Selecione uma UC</option>';
+
+    ucs.forEach(uc => {
+        const option = document.createElement('option');
+        option.value = uc.id;
+        option.textContent = `${uc.nome} (${uc.totalAulas} aulas)`;
+        selectUC.appendChild(option);
+    });
+}
+
+/**
+ * Carrega as aulas salvas do localStorage
+ */
+function carregarAulasSalvas() {
+    const chaveFrequencia = STORAGE_KEY_FREQUENCIA + turmaId;
+    const aulasSalvas = localStorage.getItem(chaveFrequencia);
+
+    if (aulasSalvas) {
+        aulas = JSON.parse(aulasSalvas);
+    } else {
+        aulas = [];
+    }
+
+    atualizarListaAulas();
+}
+
+/**
+ * Salva as aulas no localStorage
+ */
+function salvarAulas() {
+    const chaveFrequencia = STORAGE_KEY_FREQUENCIA + turmaId;
+    localStorage.setItem(chaveFrequencia, JSON.stringify(aulas));
+}
+
+// ============================================
+// FUNÇÕES DAS REGRAS
+// ============================================
+
+/**
+ * REGRA 1: Verifica se tem duas faltas consecutivas
+ */
+function temDuasFaltasConsecutivas(faltas) {
+    for (let i = 0; i < faltas.length - 1; i++) {
+        if (faltas[i] === true && faltas[i + 1] === true) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * REGRA 2: Verifica se percentual de presença é menor que 40%
+ */
+function temAlertaDeFaltas(faltas, totalAulas) {
+    if (totalAulas === 0) return false;
+    const presencas = faltas.filter(falta => falta === false).length;
+    const percentualPresenca = (presencas / totalAulas) * 100;
+    return percentualPresenca < 40;
+}
+
+/**
+ * Calcula o percentual de presença do aluno
+ */
+function calcularPercentualPresenca(faltas, totalAulas) {
+    if (totalAulas === 0) return 100;
+    const presencas = faltas.filter(falta => falta === false).length;
+    return (presencas / totalAulas) * 100;
+}
+
+/**
+ * Atualiza os alertas de frequência na tela
+ */
+function atualizarAlertas() {
+    const containerAlertas = document.getElementById('alertasFrequencia');
+
+    if (!containerAlertas) return;
+
+    if (alunos.length === 0 || aulas.length === 0) {
+        containerAlertas.innerHTML = '<p>Nenhum alerta no momento.</p>';
+        return;
+    }
+
+    const totalAulas = aulas.length;
+    let alertasHTML = '<ul>';
+    let temAlerta = false;
+
+    alunos.forEach(aluno => {
+        if (!aluno.faltas) return;
+
+        const faltasConsecutivas = temDuasFaltasConsecutivas(aluno.faltas);
+        const alertaPercentual = temAlertaDeFaltas(aluno.faltas, totalAulas);
+        const percentual = calcularPercentualPresenca(aluno.faltas, totalAulas);
+
+        if (faltasConsecutivas || alertaPercentual) {
+            temAlerta = true;
+            alertasHTML += `<li style="margin-bottom: 10px;">`;
+            alertasHTML += `<strong>${aluno.nome} (${aluno.matricula})</strong><br>`;
+
+            if (faltasConsecutivas) {
+                alertasHTML += `⚠ faltas consecutivas<br>`;
+            }
+
+            if (alertaPercentual) {
+                alertasHTML += `⚠ alerta de faltas (presença: ${percentual.toFixed(1)}%)<br>`;
+            }
+
+            alertasHTML += `<small>Histórico: ${aluno.faltas.map(f => f ? '❌' : '✅').join(' ')}</small>`;
+            alertasHTML += `</li>`;
+        }
+    });
+
+    if (!temAlerta) {
+        alertasHTML += '<li>Nenhum alerta no momento.</li>';
+    }
+
+    alertasHTML += '</ul>';
+    containerAlertas.innerHTML = alertasHTML;
+}
+
+/**
+ * Atualiza a tabela de alunos com as regras aplicadas
+ */
+function atualizarTabelaAlunos() {
+    const tbody = document.getElementById('listaAlunos');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    const totalAulas = aulas.length;
+
+    if (alunos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Nenhum aluno cadastrado nesta turma</td></tr>';
+        return;
+    }
+
+    alunos.forEach((aluno, index) => {
+        const row = tbody.insertRow();
+
+        // Matrícula
+        const cellMatricula = row.insertCell(0);
+        cellMatricula.textContent = aluno.matricula;
+        cellMatricula.style.textAlign = 'center';
+
+        // Nome do aluno
+        const cellNome = row.insertCell(1);
+        const faltasConsecutivas = aluno.faltas ? temDuasFaltasConsecutivas(aluno.faltas) : false;
+        const alertaPercentual = aluno.faltas ? temAlertaDeFaltas(aluno.faltas, totalAulas) : false;
+
+        cellNome.textContent = aluno.nome;
+
+        // Aplica cor vermelha ao nome se tiver faltas consecutivas
+        if (faltasConsecutivas) {
+            cellNome.style.color = 'red';
+            cellNome.style.fontWeight = 'bold';
+        }
+
+        // Adiciona aviso de faltas consecutivas
+        if (faltasConsecutivas) {
+            const avisoSpan = document.createElement('div');
+            avisoSpan.textContent = '⚠ faltas consecutivas';
+            avisoSpan.style.fontSize = '11px';
+            avisoSpan.style.color = 'orange';
+            cellNome.appendChild(avisoSpan);
+        }
+
+        // Adiciona alerta de faltas por percentual
+        if (alertaPercentual && aluno.faltas) {
+            const percentual = calcularPercentualPresenca(aluno.faltas, totalAulas);
+            const alertaSpan = document.createElement('div');
+            alertaSpan.textContent = `⚠ alerta faltas (${percentual.toFixed(1)}%)`;
+            alertaSpan.style.fontSize = '11px';
+            alertaSpan.style.color = 'red';
+            cellNome.appendChild(alertaSpan);
+        }
+
+        // Presença (checkbox)
+        const cellPresenca = row.insertCell(2);
+        cellPresenca.style.textAlign = 'center';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+
+        // Inicializa faltas se não existir
+        if (!aluno.faltas) {
+            aluno.faltas = new Array(aulas.length).fill(false);
+        }
+
+        // Marca o checkbox baseado na última aula
+        if (aulas.length > 0 && aluno.faltas[aulas.length - 1] !== undefined) {
+            checkbox.checked = !aluno.faltas[aulas.length - 1];
+        } else {
+            checkbox.checked = true;
+        }
+
+        checkbox.addEventListener('change', function() {
+            if (aulas.length > 0) {
+                aluno.faltas[aulas.length - 1] = !this.checked;
+                atualizarTabelaAlunos();
+                atualizarAlertas();
+            }
+        });
+
+        cellPresenca.appendChild(checkbox);
+        cellPresenca.appendChild(document.createTextNode(' Presente'));
+
+        // Status
+        const cellStatus = row.insertCell(3);
+        if (checkbox.checked) {
+            cellStatus.textContent = '✓ Presente';
+            cellStatus.style.color = 'green';
+        } else {
+            cellStatus.textContent = '✗ Ausente';
+            cellStatus.style.color = 'red';
+        }
+
+        // Atualiza status quando checkbox mudar
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                cellStatus.textContent = '✓ Presente';
+                cellStatus.style.color = 'green';
+            } else {
+                cellStatus.textContent = '✗ Ausente';
+                cellStatus.style.color = 'red';
+            }
+        });
+    });
+
+    atualizarAlertas();
+}
+
+/**
+ * Atualiza a lista de aulas salvas
+ */
+function atualizarListaAulas() {
+    const tbody = document.getElementById('listaAulas');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (aulas.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Nenhuma aula salva ainda</td></tr>';
+        return;
+    }
+
+    aulas.forEach((aula, index) => {
+        const row = tbody.insertRow();
+
+        const cellNumero = row.insertCell(0);
+        cellNumero.textContent = `Aula ${aula.numero}`;
+        cellNumero.style.textAlign = 'center';
+
+        const cellData = row.insertCell(1);
+        cellData.textContent = aula.data;
+        cellData.style.textAlign = 'center';
+
+        const cellUC = row.insertCell(2);
+        const ucEncontrada = ucs.find(u => u.id == aula.ucId);
+        cellUC.textContent = ucEncontrada ? ucEncontrada.nome : aula.ucNome;
+        cellUC.style.textAlign = 'center';
+
+        const cellStatus = row.insertCell(3);
+        cellStatus.textContent = aula.status;
+        cellStatus.style.textAlign = 'center';
+        cellStatus.style.color = 'green';
+    });
+}
+
+/**
+ * Salva a frequência atual como uma nova aula
+ */
+function salvarFrequencia() {
+    const ucId = document.getElementById('uc').value;
+    const ucNome = document.getElementById('uc').selectedOptions[0]?.textContent.split(' ')[0];
+    const dataAula = document.getElementById('dataAula').value;
+    const numeroAula = parseInt(document.getElementById('numeroAula').value);
+
+    if (!ucId) {
+        alert('Por favor, selecione uma Unidade Curricular!');
+        return;
+    }
+
+    if (!dataAula) {
+        alert('Por favor, preencha a Data da Aula!');
+        return;
+    }
+
+    if (!numeroAula || numeroAula <= 0) {
+        alert('Por favor, preencha o Número da Aula (ordem sequencial)!');
+        return;
+    }
+
+    // Verifica se já existe uma aula com esse número
+    if (aulas.some(a => a.numero === numeroAula)) {
+        alert(`Já existe uma Aula ${numeroAula} salva! Use um número diferente.`);
+        return;
+    }
+
+    if (alunos.length === 0) {
+        alert('Nenhum aluno cadastrado nesta turma! Volte para a Tela da Turma e cadastre alunos.');
+        return;
+    }
+
+    // Para cada aluno, adiciona uma nova falta (false = presente) se ainda não tiver
+    alunos.forEach(aluno => {
+        if (!aluno.faltas) {
+            aluno.faltas = [];
+        }
+        if (aluno.faltas.length <= aulas.length) {
+            aluno.faltas.push(false);
+        }
+    });
+
+    // Salva a aula
+    const novaAula = {
+        numero: numeroAula,
+        data: dataAula,
+        ucId: parseInt(ucId),
+        ucNome: ucNome,
+        status: 'Concluída'
+    };
+
+    aulas.push(novaAula);
+
+    // Ordena aulas por número sequencial
+    aulas.sort((a, b) => a.numero - b.numero);
+
+    salvarAulas();
+    atualizarListaAulas();
+    atualizarTabelaAlunos();
+
+    // Limpa os campos
+    document.getElementById('uc').value = '';
+    document.getElementById('dataAula').value = '';
+    document.getElementById('numeroAula').value = '';
+
+    alert(`Aula ${numeroAula} salva com sucesso!`);
+}
+
+/**
+ * Limpa a aula atual (sem salvar)
+ */
+function limparAulaAtual() {
+    if (confirm('Tem certeza que deseja limpar a aula atual? As marcações não salvas serão perdidas.')) {
+        document.getElementById('uc').value = '';
+        document.getElementById('dataAula').value = '';
+        document.getElementById('numeroAula').value = '';
+
+        // Recarrega os dados para limpar as marcações não salvas
+        carregarDadosTurma();
+        carregarAulasSalvas();
+        atualizarTabelaAlunos();
+    }
+}
+
+// ============================================
+// INICIALIZAÇÃO
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Carrega dados da turma
+    if (!carregarDadosTurma()) {
+        return;
+    }
+
+    // Carrega aulas salvas
+    carregarAulasSalvas();
+
+    // Atualiza tabelas
+    atualizarTabelaAlunos();
+    atualizarListaAulas();
+
+    // Configurar eventos
+    const btnSalvar = document.getElementById('btnSalvar');
+    if (btnSalvar) {
+        btnSalvar.addEventListener('click', salvarFrequencia);
+    }
+
+    const btnLimpar = document.getElementById('btnLimpar');
+    if (btnLimpar) {
+        btnLimpar.addEventListener('click', limparAulaAtual);
+    }
+
+    const btnNovaAula = document.getElementById('btnNovaAula');
+    if (btnNovaAula) {
+        btnNovaAula.addEventListener('click', function() {
+            document.getElementById('uc').value = '';
+            document.getElementById('dataAula').value = '';
+            document.getElementById('numeroAula').value = '';
+        });
+    }
+});

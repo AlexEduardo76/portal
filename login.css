@@ -1,0 +1,186 @@
+:root {
+    /* 60% - Base Neutra (Branco/Cinza) */
+    --bg-color: #f4f7f6;
+    --container-bg: #ffffff;
+    --input-bg: #ffffff;
+
+    /* 30% - Identidade (Azul Senac) */
+    --secondary-color: #004587;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --input-border: #cccccc;
+
+    /* 10% - Destaque (Laranja Senac) */
+    --accent-color: #f7941d;
+    --accent-hover: #e08216;
+
+    --shadow: 0 10px 25px rgba(0, 69, 135, 0.1);
+}
+
+[data-theme="dark"] {
+    /* 60% - Base Neutra Escura */
+    --bg-color: #002d57;
+    --container-bg: #003666;
+    --input-bg: #004587;
+
+    /* 30% - Identidade */
+    --secondary-color: #ffffff;
+    --text-main: #f8fafc;
+    --text-muted: #cbd5e1;
+    --input-border: #004587;
+
+    /* 10% - Destaque */
+    --accent-color: #f7941d;
+    --accent-hover: #ffad4a;
+
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    transition: background 0.3s ease;
+}
+
+/* Botão de Troca de Tema */
+#theme-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--container-bg);
+    border: 1px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 100;
+}
+
+/* Card de Cadastro */
+.login-container {
+    background-color: var(--container-bg);
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 12px;
+    border-top: 6px solid var(--accent-color); /* Os 10% de detalhe */
+    box-shadow: var(--shadow);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+h2 {
+    color: var(--secondary-color); /* 30% azul */
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.form-title {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--input-border);
+    padding-bottom: 10px;
+    color: var(--secondary-color);
+}
+
+/* Agrupamento de Inputs */
+.input-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 6px;
+    background: var(--input-bg);
+    color: var(--text-main);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+/* Checkbox */
+.checkbox-group {
+    margin: 15px 0;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.checkbox-group input {
+    margin-right: 8px;
+    accent-color: var(--accent-color);
+}
+
+/* Botão Principal (10% Laranja) */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+/* Rodapé e Links */
+.footer-text {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.footer-text a {
+    color: var(--secondary-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.footer-text a:hover {
+    text-decoration: underline;
+    color: var(--accent-color);
+}

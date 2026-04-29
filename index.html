@@ -1,0 +1,144 @@
+:root {
+    /* 60% - Base Neutra */
+    --bg-color: #f4f4f4;
+    --container-bg: #ffffff;
+
+    /* 30% - Identidade (Azul Senac) */
+    --secondary-color: #004587;
+    --text-main: #333333;
+
+    /* 10% - Destaque (Laranja Senac) */
+    --accent-color: #f7941d;
+    --accent-hover: #e08216;
+
+    --input-border: #cccccc;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    /* 60% - Base Neutra Escura */
+    --bg-color: #002d57;
+    --container-bg: #003666;
+
+    /* 30% - Identidade */
+    --secondary-color: #ffffff;
+    --text-main: #f0f0f0;
+
+    /* 10% - Destaque (Mantém o Laranja para Contraste) */
+    --accent-color: #f7941d;
+    --accent-hover: #ffad4a;
+
+    --input-border: #004587;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: background 0.3s ease;
+}
+
+/* Botão de Troca de Tema */
+#theme-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--container-bg);
+    border: 1px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#theme-btn:hover {
+    filter: brightness(0.9);
+}
+
+/* Container de Login */
+.login-container {
+    background-color: var(--container-bg);
+    width: 100%;
+    max-width: 380px;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+h2 {
+    color: var(--secondary-color); /* 30% */
+    margin-bottom: 30px;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 5px;
+    background: var(--container-bg);
+    color: var(--text-main);
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--secondary-color); /* 30% */
+}
+
+/* Botão Principal - OS 10% de DESTAQUE */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--accent-color); /* Laranja Senac */
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+/* Botão Secundário - OS 30% de APOIO */
+.btn-secondary {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--secondary-color); /* Azul Senac */
+    border: none;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+}
+
+#mensagem {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--secondary-color);
+}

@@ -1,0 +1,126 @@
+/* 60% - Neutros (Backgrounds e superfícies)
+   30% - Identidade (Azul Senac)
+   10% - Destaque (Laranja Senac)
+*/
+:root {
+    --bg-body: #f4f7fa;
+    --bg-card: #ffffff;
+    --nav-blue: #004587;
+    --senac-orange: #f7941d;
+    --text-primary: #1d1d1b;
+    --text-on-blue: #ffffff;
+    --border: #e0e0e0;
+    --shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Tema Escuro */
+[data-theme="dark"] {
+    --bg-body: #001a33;
+    --bg-card: #002d57;
+    --nav-blue: #001529;
+    --text-primary: #ffffff;
+    --border: #004587;
+    --shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    line-height: 1.6;
+}
+
+/* Navbar Profissional */
+.navbar {
+    background-color: var(--nav-blue);
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    color: var(--text-on-blue);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.logo b {
+    color: var(--senac-orange);
+}
+
+/* Botão de Tema */
+#theme-btn {
+    background: transparent;
+    border: 1px solid var(--senac-orange);
+    color: var(--senac-orange);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+#theme-btn:hover {
+    background: var(--senac-orange);
+    color: white;
+}
+
+/* Grid de Menu */
+.menu-container {
+    max-width: 900px;
+    margin: 3rem auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.menu-container a {
+    text-decoration: none;
+}
+
+/* Botões Estilizados como Cards */
+.menu-container button {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: var(--bg-card);
+    color: var(--nav-blue);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cor do texto no Dark Mode */
+[data-theme="dark"] .menu-container button {
+    color: #ffffff;
+}
+
+/* Hover: Aplicação dos 10% Laranja */
+.menu-container button:hover {
+    transform: translateY(-5px);
+    border-color: var(--senac-orange);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    color: var(--senac-orange);
+}
+
+.menu-container button:active {
+    transform: scale(0.98);
+}
